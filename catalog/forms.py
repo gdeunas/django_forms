@@ -5,6 +5,8 @@ from .models import Product
 
 
 class ProductForm(forms.ModelForm):
+    banned_words = ['казино', 'биржа', 'обман', 'криптовалюта', 'дешево', 'полиция', 'крипта', 'бесплатно', 'радар']
+
     class Meta:
         model = Product
         fields = ['name', 'description', 'image', 'category', 'price', ]
@@ -36,16 +38,26 @@ class ProductForm(forms.ModelForm):
                 raise ValidationError("Допустимые форматы файлов: JPEG, PNG.")
         return image
 
+    def validate_banned_words(self, value):
+        if value:
+            lower_value = value.lower()
+            for word in self.banned_words:
+                if word in lower_value:
+                    raise ValidationError(f"Использование слова '{word}' запрещено.")
+
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        self.validate_banned_words(name)
+        return name
+
+    def clean_description(self):
+        description = self.cleaned_data.get('description')
+        self.validate_banned_words(description)
+        return description
+
     def clean(self):
         cleaned_data = super().clean()
         name = cleaned_data.get('name')
         description = cleaned_data.get('description')
-        banned_words = ['казино', 'биржа', 'обман', 'криптовалюта', 'дешево', 'полиция', 'крипта', 'бесплатно', 'радар']
-
-        if Product.objects.filter(name=name, description=description).exists():
-            raise ValidationError('Продукт с таким название уже имеется.')
-
-        if any(word in name for word in banned_words):
-            raise ValidationError('Название содержит запрещенные слова.')
 
         return cleaned_data
