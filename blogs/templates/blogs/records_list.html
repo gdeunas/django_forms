@@ -1,0 +1,32 @@
+{% extends 'blogs/base.html' %}
+{% block title %}Список записей блога{% endblock %}
+
+{% block content %}
+{% include 'blogs/mainmenu.html' %}
+{% include 'blogs/header.html' %}
+
+<h2>Список записей блога:</h2>
+<div class="row">
+    {% for record in records %}
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">{{ record.title }}</h5>
+                <a href="{% url 'blogs:record_detail' record.pk %}">
+                    {% if record.image %}
+                    <img class="img-fluid mb-3" src="{{ record.image.url }}" alt="{{ record.title }}"
+                         style="max-height: 200px;">
+                    {% endif %}
+                </a>
+                <p>{{ record.content|truncatechars:100 }}</p>
+                <p>Дата публикации: {{ record.created_at }}</p>
+                <li class="list-group-item">
+                    <a href="{% url 'blogs:record_update' record.pk %}" class="btn btn-secondary">Редактировать</a>
+                    <a href="{% url 'blogs:record_delete' record.pk %}" class="btn btn-danger">Удалить</a>
+                </li>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

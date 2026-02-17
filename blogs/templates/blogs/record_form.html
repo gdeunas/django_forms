@@ -1,0 +1,22 @@
+{% extends 'blogs/base.html' %}
+
+{% block title %}Добавить новую запись{% endblock %}
+{% block content %}
+{% include 'blogs/mainmenu.html' %}
+{% include 'blogs/header.html' %}
+<form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+<h2>Новая запись</h2>
+{% for field in form %}
+<div>
+    {{ field.label_tag }} <br>
+    {{ field }}
+    {% if field.errors %}
+    <span style="color: red;">{{ field.errors }}</span>
+    {% endif %}
+</div>
+{% endfor %}
+
+<button type="submit">Сохранить запись</button>
+</form>
+{% endblock %}

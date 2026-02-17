@@ -1,0 +1,53 @@
+{% extends 'catalog/base.html' %}
+{% block title %}Список продуктов{% endblock %}
+
+{% block content %}
+{% include 'catalog/mainmenu.html' %}
+{% include 'catalog/header.html' %}
+
+<h2>Список продуктов</h2>
+<div class="row">
+    {% for product in products %}
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">{{ product.name }}</h5>
+                <a href="{% url 'catalog:product_detail' product.id %}">
+                    {% if product.image %}
+                    <img class="img-fluid mb-3" src="{{ product.image.url }}" alt="{{ product.name }}" style="max-height: 200px;">
+                    {% endif %}
+                </a>
+                <p>{{ product.description|truncatechars:100 }}</p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if is_paginated %}
+<nav aria-label="Навигация по товарам">
+    <ul class="pagination justify-content-center">
+
+        {# Ссылка на первую и предыдущую страницы #}
+        {% if page_obj.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page=1">&laquo; Первая</a></li>
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Назад</a></li>
+        {% endif %}
+
+        {# Текущая страница и общее количество #}
+        <li class="page-item disabled">
+      <span class="page-link">
+        Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+      </span>
+        </li>
+
+        {# Ссылка на следующую и последнюю страницы #}
+        {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Вперед</a></li>
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Последняя &raquo;</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}
