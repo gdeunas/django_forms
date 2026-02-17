@@ -54,10 +54,3 @@ class ProductForm(forms.ModelForm):
         description = self.cleaned_data.get('description')
         self.validate_banned_words(description)
         return description
-
-    def clean(self):
-        cleaned_data = super().clean()
-        name = cleaned_data.get('name')
-        description = cleaned_data.get('description')
-
-        return cleaned_data
