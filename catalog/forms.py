@@ -5,7 +5,7 @@ from .models import Product
 
 
 class ProductForm(forms.ModelForm):
-    banned_words = ['казино', 'биржа', 'обман', 'криптовалюта', 'дешево', 'полиция', 'крипта', 'бесплатно', 'радар']
+    BANNED_WORDS = ['казино', 'биржа', 'обман', 'криптовалюта', 'дешево', 'полиция', 'крипта', 'бесплатно', 'радар']
 
     class Meta:
         model = Product
@@ -41,7 +41,7 @@ class ProductForm(forms.ModelForm):
     def validate_banned_words(self, value):
         if value:
             lower_value = value.lower()
-            for word in self.banned_words:
+            for word in self.BANNED_WORDS:
                 if word in lower_value:
                     raise ValidationError(f"Использование слова '{word}' запрещено.")
 
