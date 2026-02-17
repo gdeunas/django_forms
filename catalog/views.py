@@ -1,5 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
+
+from .forms import ProductForm
 from .models import Product
 from django import forms
 
@@ -45,22 +47,18 @@ class ProductListView(ListView):
     paginate_by = 2
 
 
-class ProductForm(forms.ModelForm):
-    class Meta:
-        model = Product
-        fields = ['name', 'description', 'image', 'category', 'price']
-
-
 class ProductCreateView(CreateView):
     model = Product
-    fields = ['name', 'description', 'image', 'category', 'price']
+    # fields = ['name', 'description', 'image', 'category', 'price']
+    form_class = ProductForm
     template_name = 'catalog/product_form.html'
     success_url = reverse_lazy('catalog:products_list')
 
 
 class ProductUpdateView(UpdateView):
     model = Product
-    fields = ['name', 'description', 'image', 'category', 'price']
+    # fields = ['name', 'description', 'image', 'category', 'price']
+    form_class = ProductForm
     template_name = 'catalog/product_form.html'
     success_url = reverse_lazy('catalog:products_list')
 

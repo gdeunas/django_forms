@@ -1,0 +1,51 @@
+from django import forms
+from django.core.exceptions import ValidationError
+
+from .models import Product
+
+
+class ProductForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = ['name', 'description', 'image', 'category', 'price', ]
+
+    def __init__(self, *args, **kwargs):
+        super(ProductForm, self).__init__(*args, **kwargs)
+        self.fields['name'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Введите название'})
+        self.fields['description'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Введите описание'})
+        self.fields['image'].widget.attrs.update({'class': 'form-control', })
+        self.fields['category'].widget.attrs.update({'class': 'form-control'})
+        self.fields['price'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Введите цену'})
+
+    def clean_price(self):
+        price = self.cleaned_data.get('price')
+        if price < 0:
+            raise ValidationError('Цена продукта не может быть отрицательной.')
+        return price
+
+    def clean_image(self):
+        image = self.cleaned_data.get('image')
+        if image:
+            max_size = 5 * 1024 * 1024
+            if image.size > max_size:
+                raise ValidationError('Размер файла не должен превышать 5 МБ.')
+
+            allowed_extensions = ['jpeg', 'png']
+            extension = image.name.split('.')[-1].lower()
+            if extension not in allowed_extensions:
+                raise ValidationError("Допустимые форматы файлов: JPEG, PNG.")
+        return image
+
+    def clean(self):
+        cleaned_data = super().clean()
+        name = cleaned_data.get('name')
+        description = cleaned_data.get('description')
+        banned_words = ['казино', 'биржа', 'обман', 'криптовалюта', 'дешево', 'полиция', 'крипта', 'бесплатно', 'радар']
+
+        if Product.objects.filter(name=name, description=description).exists():
+            raise ValidationError('Продукт с таким название уже имеется.')
+
+        if any(word in name for word in banned_words):
+            raise ValidationError('Название содержит запрещенные слова.')
+
+        return cleaned_data
