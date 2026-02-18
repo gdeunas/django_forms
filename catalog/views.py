@@ -1,10 +1,11 @@
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render
+
+from .forms import ProductForm
 from .models import Product
-from django import forms
 
 from django.views.generic import DetailView, ListView
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.views import View
 
@@ -45,14 +46,21 @@ class ProductListView(ListView):
     paginate_by = 2
 
 
-class ProductForm(forms.ModelForm):
-    class Meta:
-        model = Product
-        fields = ['name', 'description', 'image', 'category', 'price']
-
-
 class ProductCreateView(CreateView):
     model = Product
-    fields = ['name', 'description', 'image', 'category', 'price']
+    form_class = ProductForm
     template_name = 'catalog/product_form.html'
+    success_url = reverse_lazy('catalog:products_list')
+
+
+class ProductUpdateView(UpdateView):
+    model = Product
+    form_class = ProductForm
+    template_name = 'catalog/product_form.html'
+    success_url = reverse_lazy('catalog:products_list')
+
+
+class ProductDeleteView(DeleteView):
+    model = Product
+    template_name = 'catalog/product_confirm_delete.html'
     success_url = reverse_lazy('catalog:products_list')
